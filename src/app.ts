@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import PocketBase from "pocketbase";
 import {
   acceptedLeads,
@@ -9,6 +10,8 @@ import {
 
 const app = express();
 const port = 3000;
+
+app.use(cors());
 
 app.get("/", async (req, res) => {
   const pb = new PocketBase("https://pb.nexus.iamgloria.com");
