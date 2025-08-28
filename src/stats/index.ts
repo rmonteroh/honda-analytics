@@ -1,4 +1,5 @@
 import PocketBase from "pocketbase";
+import { parseISO, getDay, format, isAfter, isBefore, parse } from "date-fns";
 
 const HONDA_ORGANIZATION_ID = "7d48b89x9b1l1e5";
 const NOT_CREATED_BY_ID = "uha4mc6yxy01gcj";
@@ -41,8 +42,8 @@ async function handleBatch(pb: PocketBase, filter: string) {
 }
 
 export const followUpStats = async (pb: PocketBase) => {
-  // organization="7d48b89x9b1l1e5" && agents ~ "51a8x36fd1265g7" && state.contact_step= "first_try" && state._agent_flow_concluded_with_opt_in != true && state._agent_flow_concluded_with_opt_in != false
-  const filter = `organization="${HONDA_ORGANIZATION_ID}" && agents ~ "${PROD_AGENT_ID}" && state.contact_step= "${FIRST_TRY_CONTACT_STEP}" && state._agent_flow_concluded_with_opt_in != true && state._agent_flow_concluded_with_opt_in != false`;
+  // organization="7d48b89x9b1l1e5" && agents ~ "51a8x36fd1265g7" && (state.contact_step= "first_try" || state.contact_step= "second_try" || state.contact_step= "change_contact_method") && state._agent_flow_concluded_with_opt_in != true && state._agent_flow_concluded_with_opt_in != false
+  const filter = `organization="${HONDA_ORGANIZATION_ID}" && agents ~ "${PROD_AGENT_ID}" && (state.contact_step= "${FIRST_TRY_CONTACT_STEP}" || state.contact_step= "second_try" || state.contact_step= "change_contact_method") && state._agent_flow_concluded_with_opt_in != true && state._agent_flow_concluded_with_opt_in != false`;
   const items = await handleBatch(pb, filter);
   return items;
 };
@@ -61,6 +62,7 @@ export const acceptedLeads = async (pb: PocketBase) => {
   // const clickedWhatsappNumber = items.filter((item) => item?.state?._last_user_decision === "accepted_whatsapp" || item?.state?._last_user_decision === "accepted_no_whatsapp");
 
   // Out of business hours
+  const outOfBusinessHours = checkingOutBusinessHours(items);
   // Aceptaron en el follow up
   const acceptInFollowUp = items.filter(
     (item) =>
@@ -70,7 +72,7 @@ export const acceptedLeads = async (pb: PocketBase) => {
 
   return {
     offeredWhatsappNumber: offeredWhatsappNumber.length || 0,
-    // outOfBusinessHours: outOfBusinessHours.length || 0,
+    outOfBusinessHours: outOfBusinessHours.length || 0,
     acceptInFollowUp: acceptInFollowUp.length || 0,
     items: items || [],
   };
@@ -92,3 +94,59 @@ export const countHondaConversations = async (pb: PocketBase) => {
   });
   return items.totalItems;
 };
+
+function checkingOutBusinessHours(items: Record<string, unknown>[]) {
+  return items.filter((item) => {
+    const state = item.state as Record<string, unknown>;
+    const contactStepAt = state?.contact_step_at;
+    const workingCallCenter = state?.working_call_center;
+
+    if (
+      !contactStepAt ||
+      !workingCallCenter ||
+      !Array.isArray(workingCallCenter) ||
+      workingCallCenter.length === 0
+    ) {
+      return false;
+    }
+
+    const contactDate = parseISO(contactStepAt as string);
+    const dayOfWeek = getDay(contactDate); // 0 = Sunday, 1 = Monday, etc.
+    const contactTime = format(contactDate, "HH:mm:ss");
+
+    const callCenter = workingCallCenter[0] as Record<string, unknown>;
+    const workSchedules =
+      (callCenter?.work_schedules as Array<Record<string, unknown>>) || [];
+
+    // Find the work schedule for this day of the week
+    const daySchedule = workSchedules.find(
+      (schedule) => schedule.day_of_week === dayOfWeek
+    );
+
+    if (!daySchedule) {
+      // No schedule for this day means it's out of business hours
+      console.log("Out of business hours", item.id);
+      return true;
+    }
+
+    const startTime = parse(
+      daySchedule.start_time as string,
+      "HH:mm:ss",
+      contactDate
+    );
+    const endTime = parse(
+      daySchedule.end_time as string,
+      "HH:mm:ss",
+      contactDate
+    );
+    const contactDateTime = parse(contactTime, "HH:mm:ss", contactDate);
+
+    // Check if contact time is outside business hours
+    const isOutOfBusinessHours =
+      isBefore(contactDateTime, startTime) || isAfter(contactDateTime, endTime);
+    if (isOutOfBusinessHours) {
+      console.log("Out of business hours", item.id);
+    }
+    return isOutOfBusinessHours;
+  });
+}

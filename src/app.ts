@@ -61,9 +61,17 @@ app.get("/", async (req, res) => {
             100
           ).toFixed(2),
         },
+        outOfBusinessHours: {
+          total: acceptLeads?.outOfBusinessHours || 0,
+          percentageBasedOnAccepts: (
+            ((acceptLeads?.outOfBusinessHours || 0) /
+              (acceptLeads?.items?.length || 0)) *
+            100
+          ).toFixed(2),
+        },
       },
     },
-    nonQualifiedRejectUsers: {
+    qualifiedRejectUsers: {
       total: rejectLeads?.length || 0,
       percentage: (
         ((rejectLeads?.length || 0) / allConversations) *
