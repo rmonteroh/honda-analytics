@@ -31,17 +31,85 @@ app.get("/", async (req, res) => {
     await Promise.all(promiseArray);
 
   const totalItems =
-    followUpUsers.length +
+    (followUpUsers?.items?.length || 0) +
+    (followUpUsers?.falsePositives.length || 0) +
     (acceptLeads?.items?.length || 0) +
     (rejectLeads?.length || 0);
   const allConversations = totalHondaConversations;
+  // const allConversations = 1;
 
   res.json({
-    nonQualifiedInFollowUpUsers: {
-      total: followUpUsers.length,
-      percentage: ((followUpUsers.length / allConversations) * 100).toFixed(2),
+    general: {
+      accepted: {
+        total: acceptLeads?.items?.length || 0,
+        percentage: (
+          ((acceptLeads?.items?.length || 0) / allConversations) *
+          100
+        ).toFixed(2),
+      },
+      declined: {
+        total: rejectLeads?.length || 0,
+        percentage: (
+          ((rejectLeads?.length || 0) / allConversations) *
+          100
+        ).toFixed(2),
+      },
+      followUp: {
+        total: followUpUsers?.items?.length || 0,
+        percentage: (
+          ((followUpUsers?.items?.length || 0) / allConversations) *
+          100
+        ).toFixed(2),
+      },
+      undelivered: {
+        total: followUpUsers?.falsePositives.length || 0,
+        percentage: (
+          ((followUpUsers?.falsePositives.length || 0) / allConversations) *
+          100
+        ).toFixed(2),
+      },
     },
-    qualifiedAcceptUsers: {
+    conversion: {
+      sentToDealerWhatsapp: {
+        total: acceptLeads?.offeredWhatsappNumber || 0,
+        percentage: (
+          ((acceptLeads?.offeredWhatsappNumber || 0) / allConversations) *
+          100
+        ).toFixed(2),
+      },
+      acceptedOutBusinessHours: {
+        total: acceptLeads?.outOfBusinessHours || 0,
+        percentage: (
+          ((acceptLeads?.outOfBusinessHours || 0) / allConversations) *
+          100
+        ).toFixed(2),
+      },
+    },
+    followUp: {
+      acceptedFirstContact: {
+        total: acceptLeads?.acceptInFollowUp || 0,
+        percentage: (
+          ((acceptLeads?.acceptInFollowUp || 0) / allConversations) *
+          100
+        ).toFixed(2),
+      },
+      acceptedSecondContact: {
+        total: acceptLeads?.acceptInFollowUpSecondTry || 0,
+        percentage: (
+          ((acceptLeads?.acceptInFollowUpSecondTry || 0) / allConversations) *
+          100
+        ).toFixed(2),
+      },
+    },
+    /* nonQualifiedInFollowUpUsers: {
+      total: followUpUsers?.items?.length || 0,
+      percentage: (
+        ((followUpUsers?.items?.length || 0) / allConversations) *
+        100
+      ).toFixed(2),
+      falsePositives: followUpUsers?.falsePositives.length || 0,
+    },
+     qualifiedAcceptUsers: {
       total: acceptLeads?.items?.length || 0,
       percentage: (
         ((acceptLeads?.items?.length || 0) / allConversations) *
@@ -80,7 +148,7 @@ app.get("/", async (req, res) => {
         ((rejectLeads?.length || 0) / allConversations) *
         100
       ).toFixed(2),
-    },
+    }, */
     totalTrackedUsers: totalItems,
     totalHondaConversations,
   });

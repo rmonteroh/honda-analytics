@@ -45,7 +45,34 @@ export const followUpStats = async (pb: PocketBase) => {
   // organization="7d48b89x9b1l1e5" && agents ~ "51a8x36fd1265g7" && (state.contact_step= "first_try" || state.contact_step= "second_try" || state.contact_step= "change_contact_method") && state._agent_flow_concluded_with_opt_in != true && state._agent_flow_concluded_with_opt_in != false
   const filter = `organization="${HONDA_ORGANIZATION_ID}" && agents ~ "${PROD_AGENT_ID}" && (state.contact_step= "${FIRST_TRY_CONTACT_STEP}" || state.contact_step= "second_try" || state.contact_step= "change_contact_method") && state._agent_flow_concluded_with_opt_in != true && state._agent_flow_concluded_with_opt_in != false`;
   const items = await handleBatch(pb, filter);
-  return items;
+  const falsePositives: string[] = [];
+  // Check messages to discart follow up false positives
+  for (const item of items) {
+    const messages = await pb.collection("messages").getList(1, 100, {
+      filter: `conversation="${item.id}"`,
+    });
+    console.log("messages", messages);
+    // Check if all messages failed
+    if (messages.items.length === 1) {
+      if (
+        messages.items[0].content.includes("{{") ||
+        messages.items[0].content.includes("}}")
+      ) {
+        falsePositives.push(item.id as string);
+        continue;
+      }
+    }
+    const allMessagesFailed = messages.items.every(
+      (message) => message?.channel_data?.messageStatus === "failed"
+    );
+    if (allMessagesFailed) {
+      falsePositives.push(item.id as string);
+    }
+  }
+  const filteredItems = items.filter(
+    (item) => !falsePositives.includes(item.id as string)
+  );
+  return { items: filteredItems, falsePositives };
 };
 
 export const acceptedLeads = async (pb: PocketBase) => {
@@ -62,18 +89,24 @@ export const acceptedLeads = async (pb: PocketBase) => {
   // const clickedWhatsappNumber = items.filter((item) => item?.state?._last_user_decision === "accepted_whatsapp" || item?.state?._last_user_decision === "accepted_no_whatsapp");
 
   // Out of business hours
-  const outOfBusinessHours = checkingOutBusinessHours(items);
+  const outOfBusinessHours = outOfBusinessHoursBaseOnLastUserDecision(items);
   // Aceptaron en el follow up
   const acceptInFollowUp = items.filter(
     (item) =>
       item?.state?._agent_flow_concluded_with_opt_in === true &&
       item?.state?.contact_step === FIRST_TRY_CONTACT_STEP
   );
+  const acceptInFollowUpSecondTry = items.filter(
+    (item) =>
+      item?.state?._agent_flow_concluded_with_opt_in === true &&
+      item?.state?.contact_step === "second_try"
+  );
 
   return {
     offeredWhatsappNumber: offeredWhatsappNumber.length || 0,
     outOfBusinessHours: outOfBusinessHours.length || 0,
     acceptInFollowUp: acceptInFollowUp.length || 0,
+    acceptInFollowUpSecondTry: acceptInFollowUpSecondTry.length || 0,
     items: items || [],
   };
 };
@@ -94,6 +127,16 @@ export const countHondaConversations = async (pb: PocketBase) => {
   });
   return items.totalItems;
 };
+
+function outOfBusinessHoursBaseOnLastUserDecision(
+  items: Record<string, unknown>[]
+) {
+  return items.filter(
+    (item) =>
+      item.state?._agent_flow_concluded_with_opt_in === true &&
+      item.state?._last_user_decision === "accepted_no_whatsapp"
+  );
+}
 
 function checkingOutBusinessHours(items: Record<string, unknown>[]) {
   return items.filter((item) => {
@@ -125,7 +168,7 @@ function checkingOutBusinessHours(items: Record<string, unknown>[]) {
 
     if (!daySchedule) {
       // No schedule for this day means it's out of business hours
-      console.log("Out of business hours", item.id);
+      // console.log("Out of business hours", item.id);
       return true;
     }
 
@@ -145,7 +188,7 @@ function checkingOutBusinessHours(items: Record<string, unknown>[]) {
     const isOutOfBusinessHours =
       isBefore(contactDateTime, startTime) || isAfter(contactDateTime, endTime);
     if (isOutOfBusinessHours) {
-      console.log("Out of business hours", item.id);
+      // console.log("Out of business hours", item.id);
     }
     return isOutOfBusinessHours;
   });

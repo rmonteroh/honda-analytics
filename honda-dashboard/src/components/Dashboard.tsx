@@ -33,34 +33,46 @@ const Dashboard: React.FC = () => {
         setLoading(true);
         // const analyticsData = await AnalyticsService.fetchAnalyticsData();
         const analyticsData = {
-          nonQualifiedInFollowUpUsers: {
-            total: 17685,
-            percentage: "66.24",
-          },
-          qualifiedAcceptUsers: {
-            total: 5516,
-            percentage: "20.66",
-            customCases: {
-              offeredWhatsappNumber: {
-                total: 1638,
-                percentageBasedOnAccepts: "29.70",
-              },
-              acceptInFirstContactStep: {
-                total: 4460,
-                percentageBasedOnAccepts: "80.86",
-              },
-              outOfBusinessHours: {
-                total: 3057,
-                percentageBasedOnAccepts: "55.42",
-              },
+          general: {
+            accepted: {
+              total: 5637,
+              percentage: "20.50",
+            },
+            declined: {
+              total: 3619,
+              percentage: "13.16",
+            },
+            followUp: {
+              total: 13578,
+              percentage: "49.39",
+            },
+            undelivered: {
+              total: 4648,
+              percentage: "16.91",
             },
           },
-          qualifiedRejectUsers: {
-            total: 3486,
-            percentage: "13.06",
+          conversion: {
+            sentToDealerWhatsapp: {
+              total: 1685,
+              percentage: "6.13",
+            },
+            acceptedOutBusinessHours: {
+              total: 333,
+              percentage: "1.21",
+            },
           },
-          totalTrackedUsers: 26687,
-          totalHondaConversations: 26697,
+          followUp: {
+            acceptedFirstContact: {
+              total: 4551,
+              percentage: "16.55",
+            },
+            acceptedSecondContact: {
+              total: 716,
+              percentage: "2.60",
+            },
+          },
+          totalTrackedUsers: 22834,
+          totalHondaConversations: 27494,
         };
         setData(analyticsData);
         setError(null);
