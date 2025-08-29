@@ -86,6 +86,10 @@ app.get("/", async (req, res) => {
   });
 });
 
+app.get("/test", async (req, res) => {
+  res.json({ message: "Hello World" });
+});
+
 app.listen(port, () => {
   return console.log(`Express is listening at http://localhost:${port}`);
 });
