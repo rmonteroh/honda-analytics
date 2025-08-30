@@ -1,28 +1,23 @@
-export interface CustomCases {
-  offeredWhatsappNumber: {
-    total: number;
-    percentageBasedOnAccepts: string;
-  };
-  acceptInFirstContactStep: {
-    total: number;
-    percentageBasedOnAccepts: string;
-  };
-  outOfBusinessHours: {
-    total: number;
-    percentageBasedOnAccepts: string;
-  };
-}
-
-export interface UserCategory {
+export interface StatData {
   total: number;
   percentage: string;
-  customCases?: CustomCases;
 }
 
 export interface AnalyticsData {
-  nonQualifiedInFollowUpUsers: UserCategory;
-  qualifiedAcceptUsers: UserCategory;
-  qualifiedRejectUsers: UserCategory;
+  general: {
+    accepted: StatData;
+    declined: StatData;
+    followUp: StatData;
+    undelivered: StatData;
+  };
+  conversion: {
+    sentToDealerWhatsapp: StatData;
+    acceptedOutBusinessHours: StatData;
+  };
+  followUp: {
+    acceptedFirstContact: StatData;
+    acceptedSecondContact: StatData;
+  };
   totalTrackedUsers: number;
   totalHondaConversations: number;
 }

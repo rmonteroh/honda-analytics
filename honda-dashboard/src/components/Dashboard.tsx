@@ -35,25 +35,25 @@ const Dashboard: React.FC = () => {
         const analyticsData = {
           general: {
             accepted: {
-              total: 5637,
-              percentage: "20.50",
+              total: 5641,
+              percentage: "20.51",
             },
             declined: {
               total: 3619,
               percentage: "13.16",
             },
             followUp: {
-              total: 13578,
-              percentage: "49.39",
+              total: 13576,
+              percentage: "49.37",
             },
             undelivered: {
-              total: 4648,
-              percentage: "16.91",
+              total: 4654,
+              percentage: "16.92",
             },
           },
           conversion: {
             sentToDealerWhatsapp: {
-              total: 1685,
+              total: 1686,
               percentage: "6.13",
             },
             acceptedOutBusinessHours: {
@@ -67,12 +67,12 @@ const Dashboard: React.FC = () => {
               percentage: "16.55",
             },
             acceptedSecondContact: {
-              total: 716,
-              percentage: "2.60",
+              total: 720,
+              percentage: "2.62",
             },
           },
-          totalTrackedUsers: 22834,
-          totalHondaConversations: 27494,
+          totalTrackedUsers: 27490,
+          totalHondaConversations: 27500,
         };
         setData(analyticsData);
         setError(null);
@@ -100,43 +100,41 @@ const Dashboard: React.FC = () => {
   }
 
   const mainDistributionData = {
-    labels: [
-      "Non-Qualified (Follow-up)",
-      "Qualified Accept",
-      "Qualified Reject",
-    ],
+    labels: ["Follow-up", "Accepted", "Declined", "Undelivered"],
     datasets: [
       {
         data: [
-          data.nonQualifiedInFollowUpUsers.total,
-          data.qualifiedAcceptUsers.total,
-          data.qualifiedRejectUsers.total,
+          data.general.followUp.total,
+          data.general.accepted.total,
+          data.general.declined.total,
+          data.general.undelivered.total,
         ],
-        backgroundColor: ["#FF6B6B", "#4ECDC4", "#45B7D1"],
+        backgroundColor: [
+          "#FFA726", // Orange for Follow-up (waiting status)
+          "#4CAF50", // Green for Accepted (success)
+          "#F44336", // Red for Declined (error/rejection)
+          "#9E9E9E", // Grey for Undelivered (inactive)
+        ],
         borderWidth: 2,
         borderColor: "#fff",
       },
     ],
   };
 
-  const acceptedUsersBreakdownData = {
+  const conversionBreakdownData = {
     labels: [
-      "Offered WhatsApp",
-      "Accept in First Contact",
-      "Out of Business Hours",
+      "Sent to Dealer WhatsApp",
+      "Accepted Whatsapp Out of Business Hours",
     ],
     datasets: [
       {
         label: "Count",
         data: [
-          data.qualifiedAcceptUsers.customCases?.offeredWhatsappNumber.total ||
-            0,
-          data.qualifiedAcceptUsers.customCases?.acceptInFirstContactStep
-            .total || 0,
-          data.qualifiedAcceptUsers.customCases?.outOfBusinessHours.total || 0,
+          data.conversion.sentToDealerWhatsapp.total,
+          data.conversion.acceptedOutBusinessHours.total,
         ],
-        backgroundColor: ["#96CEB4", "#FECA57", "#FF9FF3"],
-        borderColor: ["#96CEB4", "#FECA57", "#FF9FF3"],
+        backgroundColor: ["#96CEB4", "#FECA57"],
+        borderColor: ["#96CEB4", "#FECA57"],
         borderWidth: 1,
       },
     ],
@@ -153,13 +151,23 @@ const Dashboard: React.FC = () => {
           label: (context: any) => {
             const label = context.label;
             const value = context.raw;
-            const percentage = data
-              ? context.dataIndex === 0
-                ? data.nonQualifiedInFollowUpUsers.percentage
-                : context.dataIndex === 1
-                ? data.qualifiedAcceptUsers.percentage
-                : data.qualifiedRejectUsers.percentage
-              : "0";
+            let percentage = "0";
+            if (data) {
+              switch (context.dataIndex) {
+                case 0:
+                  percentage = data.general.followUp.percentage;
+                  break;
+                case 1:
+                  percentage = data.general.accepted.percentage;
+                  break;
+                case 2:
+                  percentage = data.general.declined.percentage;
+                  break;
+                case 3:
+                  percentage = data.general.undelivered.percentage;
+                  break;
+              }
+            }
             return `${label}: ${value} (${percentage}%)`;
           },
         },
@@ -176,25 +184,17 @@ const Dashboard: React.FC = () => {
       tooltip: {
         callbacks: {
           afterLabel: (context: any) => {
-            const customCases = data.qualifiedAcceptUsers.customCases;
-            if (!customCases) return "";
-
             let percentage = "";
             switch (context.dataIndex) {
               case 0:
-                percentage =
-                  customCases.offeredWhatsappNumber.percentageBasedOnAccepts;
+                percentage = data.conversion.sentToDealerWhatsapp.percentage;
                 break;
               case 1:
                 percentage =
-                  customCases.acceptInFirstContactStep.percentageBasedOnAccepts;
-                break;
-              case 2:
-                percentage =
-                  customCases.outOfBusinessHours.percentageBasedOnAccepts;
+                  data.conversion.acceptedOutBusinessHours.percentage;
                 break;
             }
-            return `${percentage}% of accepted users`;
+            return `${percentage}% of total conversations`;
           },
         },
       },
@@ -212,7 +212,7 @@ const Dashboard: React.FC = () => {
         <h1>Honda Analytics Dashboard</h1>
         <div className="summary-stats">
           <div className="stat-card">
-            <h3>Total Tracked Users</h3>
+            <h3>Total Tracked Conversations</h3>
             <p className="stat-number">
               {data.totalTrackedUsers.toLocaleString()}
             </p>
@@ -235,70 +235,66 @@ const Dashboard: React.FC = () => {
         </div>
 
         <div className="chart-section">
-          <h2>Qualified Accept Users Breakdown</h2>
+          <h2>Conversion Breakdown</h2>
           <div className="chart-wrapper">
-            <Bar data={acceptedUsersBreakdownData} options={barOptions} />
+            <Bar data={conversionBreakdownData} options={barOptions} />
           </div>
         </div>
       </div>
 
       <div className="details-section">
         <div className="detail-card">
-          <h3>Non-Qualified Follow-up Users</h3>
-          <p>
-            {data.nonQualifiedInFollowUpUsers.total.toLocaleString()} (
-            {data.nonQualifiedInFollowUpUsers.percentage}%)
-          </p>
+          <h3>General Statistics</h3>
+          <ul>
+            <li>
+              Accepted: {data.general.accepted.total.toLocaleString()} (
+              {data.general.accepted.percentage}%)
+            </li>
+            <li>
+              Declined: {data.general.declined.total.toLocaleString()} (
+              {data.general.declined.percentage}%)
+            </li>
+            <li>
+              Follow-up: {data.general.followUp.total.toLocaleString()} (
+              {data.general.followUp.percentage}%)
+            </li>
+            <li>
+              Undelivered: {data.general.undelivered.total.toLocaleString()} (
+              {data.general.undelivered.percentage}%)
+            </li>
+          </ul>
         </div>
 
         <div className="detail-card">
-          <h3>Qualified Accept Users</h3>
-          <p>
-            {data.qualifiedAcceptUsers.total.toLocaleString()} (
-            {data.qualifiedAcceptUsers.percentage}%)
-          </p>
-          {data.qualifiedAcceptUsers.customCases && (
-            <ul>
-              <li>
-                Offered WhatsApp:{" "}
-                {data.qualifiedAcceptUsers.customCases.offeredWhatsappNumber.total.toLocaleString()}{" "}
-                (
-                {
-                  data.qualifiedAcceptUsers.customCases.offeredWhatsappNumber
-                    .percentageBasedOnAccepts
-                }
-                %)
-              </li>
-              <li>
-                Accept in First Contact:{" "}
-                {data.qualifiedAcceptUsers.customCases.acceptInFirstContactStep.total.toLocaleString()}{" "}
-                (
-                {
-                  data.qualifiedAcceptUsers.customCases.acceptInFirstContactStep
-                    .percentageBasedOnAccepts
-                }
-                %)
-              </li>
-              <li>
-                Out of Business Hours:{" "}
-                {data.qualifiedAcceptUsers.customCases.outOfBusinessHours.total.toLocaleString()}{" "}
-                (
-                {
-                  data.qualifiedAcceptUsers.customCases.outOfBusinessHours
-                    .percentageBasedOnAccepts
-                }
-                %)
-              </li>
-            </ul>
-          )}
+          <h3>Conversion Details</h3>
+          <ul>
+            <li>
+              Sent to Dealer WhatsApp:{" "}
+              {data.conversion.sentToDealerWhatsapp.total.toLocaleString()} (
+              {data.conversion.sentToDealerWhatsapp.percentage}%)
+            </li>
+            <li>
+              Accepted Whatsapp Out of Business Hours:{" "}
+              {data.conversion.acceptedOutBusinessHours.total.toLocaleString()}{" "}
+              ({data.conversion.acceptedOutBusinessHours.percentage}%)
+            </li>
+          </ul>
         </div>
 
         <div className="detail-card">
-          <h3>Qualified Reject Users</h3>
-          <p>
-            {data.qualifiedRejectUsers.total.toLocaleString()} (
-            {data.qualifiedRejectUsers.percentage}%)
-          </p>
+          <h3>Follow-up Statistics</h3>
+          <ul>
+            <li>
+              Accepted First Contact:{" "}
+              {data.followUp.acceptedFirstContact.total.toLocaleString()} (
+              {data.followUp.acceptedFirstContact.percentage}%)
+            </li>
+            <li>
+              Accepted Second Contact:{" "}
+              {data.followUp.acceptedSecondContact.total.toLocaleString()} (
+              {data.followUp.acceptedSecondContact.percentage}%)
+            </li>
+          </ul>
         </div>
       </div>
     </div>

@@ -30,6 +30,11 @@ app.get("/", async (req, res) => {
   const [followUpUsers, acceptLeads, rejectLeads, totalHondaConversations] =
     await Promise.all(promiseArray);
 
+  console.log("followUpUsers -> ", followUpUsers?.items?.length);
+  console.log("falsePositives -> ", followUpUsers?.falsePositives.length);
+  console.log("acceptLeads -> ", acceptLeads?.items?.length);
+  console.log("rejectLeads -> ", rejectLeads?.length);
+
   const totalItems =
     (followUpUsers?.items?.length || 0) +
     (followUpUsers?.falsePositives.length || 0) +
