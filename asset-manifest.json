@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/honda-analytics/static/css/main.5df0178b.css",
-    "main.js": "/honda-analytics/static/js/main.248b5327.js",
+    "main.css": "/honda-analytics/static/css/main.c4ef1482.css",
+    "main.js": "/honda-analytics/static/js/main.17f90d03.js",
     "static/js/453.0f95ca61.chunk.js": "/honda-analytics/static/js/453.0f95ca61.chunk.js",
     "index.html": "/honda-analytics/index.html",
-    "main.5df0178b.css.map": "/honda-analytics/static/css/main.5df0178b.css.map",
-    "main.248b5327.js.map": "/honda-analytics/static/js/main.248b5327.js.map",
+    "main.c4ef1482.css.map": "/honda-analytics/static/css/main.c4ef1482.css.map",
+    "main.17f90d03.js.map": "/honda-analytics/static/js/main.17f90d03.js.map",
     "453.0f95ca61.chunk.js.map": "/honda-analytics/static/js/453.0f95ca61.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.5df0178b.css",
-    "static/js/main.248b5327.js"
+    "static/css/main.c4ef1482.css",
+    "static/js/main.17f90d03.js"
   ]
 }
