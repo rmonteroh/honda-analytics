@@ -399,6 +399,11 @@ const Dashboard: React.FC = () => {
               {data.followUp.acceptedSecondContact.total.toLocaleString()} (
               {data.followUp.acceptedSecondContact.percentage}%)
             </li>
+            <li>
+              Call Center Contact:{" "}
+              {(data.general.accepted.total - data.followUp.acceptedFirstContact.total - data.followUp.acceptedSecondContact.total).toLocaleString()} (
+              {(((data.general.accepted.total - data.followUp.acceptedFirstContact.total - data.followUp.acceptedSecondContact.total) / data.totalHondaConversations) * 100).toFixed(2)}%)
+            </li>
           </ul>
         </div>
       </div>
