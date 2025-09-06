@@ -114,14 +114,15 @@ const Dashboard: React.FC = () => {
   };
 
   const conversionBreakdownData = {
-    labels: ["Accepted Whatsapp Contact", "Declined Whatsapp Contact"],
+    labels: ["Accepted Whatsapp Contact", "Declined Whatsapp Contact", "Other Accepted"],
     datasets: [
       {
         data: [
           data.conversion.sentToDealerWhatsapp.total,
           data.conversion.acceptedOutBusinessHours.total,
+          data.general.accepted.total - data.conversion.sentToDealerWhatsapp.total - data.conversion.acceptedOutBusinessHours.total,
         ],
-        backgroundColor: ["#4CAF50", "#F44336"],
+        backgroundColor: ["#4CAF50", "#F44336", "#9E9E9E"],
         borderWidth: 2,
         borderColor: "#fff",
       },
@@ -206,6 +207,10 @@ const Dashboard: React.FC = () => {
                       totalAccepted) *
                     100
                   ).toFixed(2);
+                  break;
+                case 2:
+                  const otherAccepted = totalAccepted - data.conversion.sentToDealerWhatsapp.total - data.conversion.acceptedOutBusinessHours.total;
+                  percentage = ((otherAccepted / totalAccepted) * 100).toFixed(2);
                   break;
               }
             }
