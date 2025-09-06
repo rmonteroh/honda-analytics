@@ -114,13 +114,19 @@ const Dashboard: React.FC = () => {
   };
 
   const conversionBreakdownData = {
-    labels: ["Accepted Whatsapp Contact", "Declined Whatsapp Contact", "Other Accepted"],
+    labels: [
+      "Accepted Whatsapp Contact",
+      "Declined Whatsapp Contact",
+      "Accepted without Whatsapp Contact",
+    ],
     datasets: [
       {
         data: [
           data.conversion.sentToDealerWhatsapp.total,
           data.conversion.acceptedOutBusinessHours.total,
-          data.general.accepted.total - data.conversion.sentToDealerWhatsapp.total - data.conversion.acceptedOutBusinessHours.total,
+          data.general.accepted.total -
+            data.conversion.sentToDealerWhatsapp.total -
+            data.conversion.acceptedOutBusinessHours.total,
         ],
         backgroundColor: ["#4CAF50", "#F44336", "#9E9E9E"],
         borderWidth: 2,
@@ -130,14 +136,21 @@ const Dashboard: React.FC = () => {
   };
 
   const followUpBreakdownData = {
-    labels: ["Accepted First Contact", "Accepted Second Contact"],
+    labels: [
+      "Accepted In First Contact",
+      "Accepted In Second Contact",
+      "Call Center Contact",
+    ],
     datasets: [
       {
         data: [
           data.followUp.acceptedFirstContact.total,
           data.followUp.acceptedSecondContact.total,
+          data.general.accepted.total -
+            data.followUp.acceptedFirstContact.total -
+            data.followUp.acceptedSecondContact.total,
         ],
-        backgroundColor: ["#4CAF50", "#FF9800"],
+        backgroundColor: ["#4CAF50", "#FF9800", "#9E9E9E"],
         borderWidth: 2,
         borderColor: "#fff",
       },
@@ -209,8 +222,13 @@ const Dashboard: React.FC = () => {
                   ).toFixed(2);
                   break;
                 case 2:
-                  const otherAccepted = totalAccepted - data.conversion.sentToDealerWhatsapp.total - data.conversion.acceptedOutBusinessHours.total;
-                  percentage = ((otherAccepted / totalAccepted) * 100).toFixed(2);
+                  const otherAccepted =
+                    totalAccepted -
+                    data.conversion.sentToDealerWhatsapp.total -
+                    data.conversion.acceptedOutBusinessHours.total;
+                  percentage = ((otherAccepted / totalAccepted) * 100).toFixed(
+                    2
+                  );
                   break;
               }
             }
@@ -246,6 +264,16 @@ const Dashboard: React.FC = () => {
                   percentage = (
                     (data.followUp.acceptedSecondContact.total /
                       totalAccepted) *
+                    100
+                  ).toFixed(2);
+                  break;
+                case 2:
+                  const otherAcceptedFollowUp =
+                    totalAccepted -
+                    data.followUp.acceptedFirstContact.total -
+                    data.followUp.acceptedSecondContact.total;
+                  percentage = (
+                    (otherAcceptedFollowUp / totalAccepted) *
                     100
                   ).toFixed(2);
                   break;
