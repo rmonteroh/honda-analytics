@@ -380,6 +380,11 @@ const Dashboard: React.FC = () => {
               {data.conversion.acceptedOutBusinessHours.total.toLocaleString()}{" "}
               ({data.conversion.acceptedOutBusinessHours.percentage}%)
             </li>
+            <li>
+              Accepted without Whatsapp Contact:{" "}
+              {(data.general.accepted.total - data.conversion.sentToDealerWhatsapp.total - data.conversion.acceptedOutBusinessHours.total).toLocaleString()} (
+              {(((data.general.accepted.total - data.conversion.sentToDealerWhatsapp.total - data.conversion.acceptedOutBusinessHours.total) / data.totalHondaConversations) * 100).toFixed(2)}%)
+            </li>
           </ul>
         </div>
 
