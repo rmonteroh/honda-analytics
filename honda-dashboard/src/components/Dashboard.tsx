@@ -27,44 +27,44 @@ const Dashboard: React.FC = () => {
         const analyticsData = {
           general: {
             accepted: {
-              total: 6100,
-              percentage: "20.82",
+              total: 6158,
+              percentage: "20.80",
             },
             declined: {
-              total: 3875,
-              percentage: "13.23",
+              total: 3925,
+              percentage: "13.26",
             },
             followUp: {
-              total: 14414,
-              percentage: "49.21",
+              total: 14581,
+              percentage: "49.24",
             },
             undelivered: {
-              total: 4890,
-              percentage: "16.69",
+              total: 4936,
+              percentage: "16.67",
             },
           },
           conversion: {
             sentToDealerWhatsapp: {
-              total: 1775,
+              total: 1795,
               percentage: "6.06",
             },
             acceptedOutBusinessHours: {
-              total: 349,
+              total: 352,
               percentage: "1.19",
             },
           },
           followUp: {
             acceptedFirstContact: {
-              total: 4933,
-              percentage: "16.84",
+              total: 4980,
+              percentage: "16.82",
             },
             acceptedSecondContact: {
-              total: 787,
+              total: 796,
               percentage: "2.69",
             },
           },
-          totalTrackedUsers: 29279,
-          totalHondaConversations: 29293,
+          totalTrackedUsers: 29600,
+          totalHondaConversations: 29611,
         };
         setData(analyticsData);
         setError(null);
@@ -382,8 +382,20 @@ const Dashboard: React.FC = () => {
             </li>
             <li>
               Accepted without Whatsapp Contact:{" "}
-              {(data.general.accepted.total - data.conversion.sentToDealerWhatsapp.total - data.conversion.acceptedOutBusinessHours.total).toLocaleString()} (
-              {(((data.general.accepted.total - data.conversion.sentToDealerWhatsapp.total - data.conversion.acceptedOutBusinessHours.total) / data.totalHondaConversations) * 100).toFixed(2)}%)
+              {(
+                data.general.accepted.total -
+                data.conversion.sentToDealerWhatsapp.total -
+                data.conversion.acceptedOutBusinessHours.total
+              ).toLocaleString()}{" "}
+              (
+              {(
+                ((data.general.accepted.total -
+                  data.conversion.sentToDealerWhatsapp.total -
+                  data.conversion.acceptedOutBusinessHours.total) /
+                  data.totalHondaConversations) *
+                100
+              ).toFixed(2)}
+              %)
             </li>
           </ul>
         </div>
@@ -406,8 +418,20 @@ const Dashboard: React.FC = () => {
             </li>
             <li>
               Call Center Contact:{" "}
-              {(data.general.accepted.total - data.followUp.acceptedFirstContact.total - data.followUp.acceptedSecondContact.total).toLocaleString()} (
-              {(((data.general.accepted.total - data.followUp.acceptedFirstContact.total - data.followUp.acceptedSecondContact.total) / data.totalHondaConversations) * 100).toFixed(2)}%)
+              {(
+                data.general.accepted.total -
+                data.followUp.acceptedFirstContact.total -
+                data.followUp.acceptedSecondContact.total
+              ).toLocaleString()}{" "}
+              (
+              {(
+                ((data.general.accepted.total -
+                  data.followUp.acceptedFirstContact.total -
+                  data.followUp.acceptedSecondContact.total) /
+                  data.totalHondaConversations) *
+                100
+              ).toFixed(2)}
+              %)
             </li>
           </ul>
         </div>
