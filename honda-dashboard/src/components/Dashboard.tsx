@@ -6,21 +6,13 @@ import {
   Legend,
   CategoryScale,
   LinearScale,
-  BarElement,
 } from "chart.js";
-import { Pie, Bar } from "react-chartjs-2";
+import { Pie } from "react-chartjs-2";
 import { AnalyticsData } from "../types/analytics";
 import { AnalyticsService } from "../services/analyticsApi";
 import "./Dashboard.css";
 
-ChartJS.register(
-  ArcElement,
-  Tooltip,
-  Legend,
-  CategoryScale,
-  LinearScale,
-  BarElement
-);
+ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale);
 
 const Dashboard: React.FC = () => {
   const [data, setData] = useState<AnalyticsData | null>(null);
@@ -122,20 +114,31 @@ const Dashboard: React.FC = () => {
   };
 
   const conversionBreakdownData = {
-    labels: [
-      "Sent to Dealer WhatsApp",
-      "Accepted Whatsapp Out of Business Hours",
-    ],
+    labels: ["Accepted Whatsapp Contact", "Declined Whatsapp Contact"],
     datasets: [
       {
-        label: "Count",
         data: [
           data.conversion.sentToDealerWhatsapp.total,
           data.conversion.acceptedOutBusinessHours.total,
         ],
-        backgroundColor: ["#96CEB4", "#FECA57"],
-        borderColor: ["#96CEB4", "#FECA57"],
-        borderWidth: 1,
+        backgroundColor: ["#4CAF50", "#F44336"],
+        borderWidth: 2,
+        borderColor: "#fff",
+      },
+    ],
+  };
+
+  const followUpBreakdownData = {
+    labels: ["Accepted First Contact", "Accepted Second Contact"],
+    datasets: [
+      {
+        data: [
+          data.followUp.acceptedFirstContact.total,
+          data.followUp.acceptedSecondContact.total,
+        ],
+        backgroundColor: ["#4CAF50", "#FF9800"],
+        borderWidth: 2,
+        borderColor: "#fff",
       },
     ],
   };
@@ -168,40 +171,84 @@ const Dashboard: React.FC = () => {
                   break;
               }
             }
-            return `${label}: ${value} (${percentage}%)`;
+            return `  ${value} (${percentage}%)`;
           },
         },
       },
     },
   };
 
-  const barOptions = {
+  const conversionPieOptions = {
     responsive: true,
     plugins: {
       legend: {
-        display: false,
+        position: "bottom" as const,
       },
       tooltip: {
         callbacks: {
-          afterLabel: (context: any) => {
-            let percentage = "";
-            switch (context.dataIndex) {
-              case 0:
-                percentage = data.conversion.sentToDealerWhatsapp.percentage;
-                break;
-              case 1:
-                percentage =
-                  data.conversion.acceptedOutBusinessHours.percentage;
-                break;
+          label: (context: any) => {
+            const label = context.label;
+            const value = context.raw;
+            let percentage = "0";
+            if (data) {
+              const totalAccepted = data.general.accepted.total;
+              switch (context.dataIndex) {
+                case 0:
+                  percentage = (
+                    (data.conversion.sentToDealerWhatsapp.total /
+                      totalAccepted) *
+                    100
+                  ).toFixed(2);
+                  break;
+                case 1:
+                  percentage = (
+                    (data.conversion.acceptedOutBusinessHours.total /
+                      totalAccepted) *
+                    100
+                  ).toFixed(2);
+                  break;
+              }
             }
-            return `${percentage}% of total conversations`;
+            return ` ${value} (${percentage}% of accepted)`;
           },
         },
       },
     },
-    scales: {
-      y: {
-        beginAtZero: true,
+  };
+
+  const followUpPieOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "bottom" as const,
+      },
+      tooltip: {
+        callbacks: {
+          label: (context: any) => {
+            const label = context.label;
+            const value = context.raw;
+            let percentage = "0";
+            if (data) {
+              const totalAccepted = data.general.accepted.total;
+              switch (context.dataIndex) {
+                case 0:
+                  percentage = (
+                    (data.followUp.acceptedFirstContact.total / totalAccepted) *
+                    100
+                  ).toFixed(2);
+                  break;
+                case 1:
+                  percentage = (
+                    (data.followUp.acceptedSecondContact.total /
+                      totalAccepted) *
+                    100
+                  ).toFixed(2);
+                  break;
+              }
+            }
+            return ` ${value} (${percentage}% of accepted)`;
+          },
+        },
       },
     },
   };
@@ -212,32 +259,51 @@ const Dashboard: React.FC = () => {
         <h1>Honda Analytics Dashboard</h1>
         <div className="summary-stats">
           <div className="stat-card">
-            <h3>Total Tracked Conversations</h3>
+            <h3>Total Client Conversations</h3>
             <p className="stat-number">
               {data.totalTrackedUsers.toLocaleString()}
             </p>
           </div>
-          <div className="stat-card">
+          {/* <div className="stat-card">
             <h3>Total Conversations</h3>
             <p className="stat-number">
               {data.totalHondaConversations.toLocaleString()}
             </p>
-          </div>
+          </div> */}
         </div>
       </header>
 
       <div className="charts-container">
         <div className="chart-section">
           <h2>Lead Distribution</h2>
+          <p className="chart-description">Distribution based on status</p>
           <div className="chart-wrapper">
             <Pie data={mainDistributionData} options={pieOptions} />
           </div>
         </div>
 
         <div className="chart-section">
-          <h2>Conversion Breakdown</h2>
+          <h2>Whatsapp Conversion</h2>
+          <p className="chart-description">
+            Based on total accepted leads (
+            {data.general.accepted.total.toLocaleString()})
+          </p>
           <div className="chart-wrapper">
-            <Bar data={conversionBreakdownData} options={barOptions} />
+            <Pie
+              data={conversionBreakdownData}
+              options={conversionPieOptions}
+            />
+          </div>
+        </div>
+
+        <div className="chart-section">
+          <h2>Accepted Conversion</h2>
+          <p className="chart-description">
+            Based on total accepted leads (
+            {data.general.accepted.total.toLocaleString()})
+          </p>
+          <div className="chart-wrapper">
+            <Pie data={followUpBreakdownData} options={followUpPieOptions} />
           </div>
         </div>
       </div>
@@ -266,15 +332,18 @@ const Dashboard: React.FC = () => {
         </div>
 
         <div className="detail-card">
-          <h3>Conversion Details</h3>
+          <h3>Whatsapp Conversion Details</h3>
+          <p style={{ fontSize: "0.8em", color: "#7f8c8d", fontWeight: "400" }}>
+            Percentage base on total conversations
+          </p>
           <ul>
             <li>
-              Sent to Dealer WhatsApp:{" "}
+              Accepted Whatsapp Contact:{" "}
               {data.conversion.sentToDealerWhatsapp.total.toLocaleString()} (
               {data.conversion.sentToDealerWhatsapp.percentage}%)
             </li>
             <li>
-              Accepted Whatsapp Out of Business Hours:{" "}
+              Declined Whatsapp Contact:{" "}
               {data.conversion.acceptedOutBusinessHours.total.toLocaleString()}{" "}
               ({data.conversion.acceptedOutBusinessHours.percentage}%)
             </li>
@@ -282,7 +351,10 @@ const Dashboard: React.FC = () => {
         </div>
 
         <div className="detail-card">
-          <h3>Follow-up Statistics</h3>
+          <h3>Accepted Conversion</h3>
+          <p style={{ fontSize: "0.8em", color: "#7f8c8d", fontWeight: "400" }}>
+            Percentage base on total conversations
+          </p>
           <ul>
             <li>
               Accepted First Contact:{" "}
