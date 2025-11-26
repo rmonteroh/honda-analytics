@@ -1,0 +1,42 @@
+{
+  "general": {
+    "accepted": {
+      "total": 18600,
+      "percentage": "18.45"
+    },
+    "declined": {
+      "total": 12556,
+      "percentage": "12.46"
+    },
+    "followUp": {
+      "total": 41422,
+      "percentage": "41.10"
+    },
+    "undelivered": {
+      "total": 20436,
+      "percentage": "20.28"
+    }
+  },
+  "conversion": {
+    "sentToDealerWhatsapp": {
+      "total": 5316,
+      "percentage": "5.27"
+    },
+    "acceptedOutBusinessHours": {
+      "total": 875,
+      "percentage": "0.87"
+    }
+  },
+  "followUp": {
+    "acceptedFirstContact": {
+      "total": 15621,
+      "percentage": "15.50"
+    },
+    "acceptedSecondContact": {
+      "total": 2318,
+      "percentage": "2.30"
+    }
+  },
+  "totalTrackedUsers": 93014,
+  "totalHondaConversations": 100788
+}

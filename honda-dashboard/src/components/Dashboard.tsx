@@ -27,44 +27,44 @@ const Dashboard: React.FC = () => {
         const analyticsData = {
           general: {
             accepted: {
-              total: 7383,
-              percentage: "20.29",
+              total: 18600,
+              percentage: "18.45",
             },
             declined: {
-              total: 4927,
-              percentage: "13.54",
+              total: 12556,
+              percentage: "12.46",
             },
             followUp: {
-              total: 18157,
-              percentage: "49.91",
+              total: 41422,
+              percentage: "41.10",
             },
             undelivered: {
-              total: 5902,
-              percentage: "16.22",
+              total: 20436,
+              percentage: "20.28",
             },
           },
           conversion: {
             sentToDealerWhatsapp: {
-              total: 2168,
-              percentage: "5.96",
+              total: 5316,
+              percentage: "5.27",
             },
             acceptedOutBusinessHours: {
-              total: 419,
-              percentage: "1.15",
+              total: 875,
+              percentage: "0.87",
             },
           },
           followUp: {
             acceptedFirstContact: {
-              total: 5976,
-              percentage: "16.43",
+              total: 15621,
+              percentage: "15.50",
             },
             acceptedSecondContact: {
-              total: 1006,
-              percentage: "2.77",
+              total: 2318,
+              percentage: "2.30",
             },
           },
-          totalTrackedUsers: 36369,
-          totalHondaConversations: 36383,
+          totalTrackedUsers: 93014,
+          totalHondaConversations: 100788,
         };
         setData(analyticsData);
         setError(null);
