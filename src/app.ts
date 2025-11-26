@@ -18,7 +18,7 @@ app.get("/", async (req, res) => {
   // authenticate as auth collection record
   const userData = await pb
     .collection("_superusers")
-    .authWithPassword("ricardo@webtroniclabs.com", "v4h-5gN0pVActOf");
+    .authWithPassword("ricardo@webtroniclabs.com", "qF0-LD1TJtwKN-G");
 
   const promiseArray = [
     followUpStats(pb),
