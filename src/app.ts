@@ -14,11 +14,11 @@ const port = 3000;
 app.use(cors());
 
 app.get("/", async (req, res) => {
-  const pb = new PocketBase("https://pb.nexus.iamgloria.com");
+  const pb = new PocketBase("https://pb-nexus.iamgloria.com");
   // authenticate as auth collection record
   const userData = await pb
     .collection("_superusers")
-    .authWithPassword("ricardo@webtroniclabs.com", "v4h-5gN0pVActOf");
+    .authWithPassword("ricardo@webtroniclabs.com", "Lalalala123!");
 
   const promiseArray = [
     followUpStats(pb),

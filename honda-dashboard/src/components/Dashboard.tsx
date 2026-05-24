@@ -19,7 +19,7 @@ ChartJS.register(
   Legend,
   CategoryScale,
   LinearScale,
-  BarElement
+  BarElement,
 );
 
 const Dashboard: React.FC = () => {
@@ -35,44 +35,44 @@ const Dashboard: React.FC = () => {
         const analyticsData = {
           general: {
             accepted: {
-              total: 5641,
-              percentage: "20.51",
+              total: 22400,
+              percentage: "10.72",
             },
             declined: {
-              total: 3619,
-              percentage: "13.16",
+              total: 22200,
+              percentage: "10.62",
             },
             followUp: {
-              total: 13576,
-              percentage: "49.37",
+              total: 13885,
+              percentage: "6.65",
             },
             undelivered: {
-              total: 4654,
-              percentage: "16.92",
+              total: 4515,
+              percentage: "2.16",
             },
           },
           conversion: {
             sentToDealerWhatsapp: {
-              total: 1686,
-              percentage: "6.13",
+              total: 6425,
+              percentage: "3.07",
             },
             acceptedOutBusinessHours: {
-              total: 333,
-              percentage: "1.21",
+              total: 991,
+              percentage: "0.47",
             },
           },
           followUp: {
             acceptedFirstContact: {
-              total: 4551,
-              percentage: "16.55",
+              total: 18975,
+              percentage: "9.08",
             },
             acceptedSecondContact: {
-              total: 720,
-              percentage: "2.62",
+              total: 2704,
+              percentage: "1.29",
             },
           },
-          totalTrackedUsers: 27490,
-          totalHondaConversations: 27500,
+          totalTrackedUsers: 63000,
+          totalHondaConversations: 208944,
         };
         setData(analyticsData);
         setError(null);
